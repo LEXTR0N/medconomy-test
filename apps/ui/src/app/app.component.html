@@ -1,6 +1,24 @@
+<div class="min-h-screen bg-gray-50">
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center space-x-4">
+        <h1 class="text-2xl font-bold text-blue-700">Acme Admin UI</h1>
+        <nav class="ml-auto">
+          <a routerLink="/users" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md transition duration-200">
+            Users
+          </a>
+        </nav>
+      </div>
+    </div>
+  </header>
 
-<div class="container">
-  <h1>Acme Admin UI</h1>
+  <main class="container mx-auto px-4 py-6">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="bg-gray-800 text-white mt-auto">
+    <div class="container mx-auto px-4 py-4 text-center text-sm">
+      <p>Acme Admin UI &copy; 2025</p>
+    </div>
+  </footer>
 </div>
-
-<router-outlet></router-outlet>

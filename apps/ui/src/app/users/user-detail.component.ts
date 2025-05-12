@@ -1,13 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCardModule } from '@angular/material/card';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UserService } from '../shared/user.service';
 import { CompanyService } from '../shared/company.service';
 import { User, Company } from '../shared/user.model';
@@ -19,82 +14,10 @@ import { CompanyDialogComponent } from './company-dialog.component';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatCardModule,
     MatDialogModule
   ],
-  template: `
-    <div class="container mt-8">
-      <div class="flex justify-between items-center mb-4">
-        <h1>{{ isNewUser ? 'Create New User' : 'Edit User' }}</h1>
-        <button mat-button color="primary" (click)="goBack()">Back to List</button>
-      </div>
-
-      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="mt-4">
-        <mat-card>
-          <mat-card-content>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Name</mat-label>
-                <input matInput formControlName="name" placeholder="Enter name">
-                <mat-error *ngIf="userForm.get('name')?.hasError('required')">
-                  Name is required
-                </mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Position</mat-label>
-                <input matInput formControlName="position" placeholder="Enter position">
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Email</mat-label>
-                <input matInput formControlName="email" placeholder="Enter email">
-                <mat-error *ngIf="userForm.get('email')?.hasError('email')">
-                  Please enter a valid email
-                </mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="w-full">
-                <mat-label>Address</mat-label>
-                <input matInput formControlName="address" placeholder="Enter address">
-              </mat-form-field>
-
-              <div class="flex items-center">
-                <mat-form-field appearance="outline" class="w-full">
-                  <mat-label>Company</mat-label>
-                  <mat-select formControlName="companyId">
-                    <mat-option [value]="null">None</mat-option>
-                    <mat-option *ngFor="let company of companies" [value]="company.id">
-                      {{ company.name }}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-                <button 
-                  type="button" 
-                  mat-mini-fab 
-                  color="primary" 
-                  class="ml-2"
-                  (click)="openCompanyDialog()"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          </mat-card-content>
-          <mat-card-actions align="end">
-            <button mat-button type="button" (click)="goBack()">Cancel</button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="userForm.invalid">
-              {{ isNewUser ? 'Create' : 'Update' }}
-            </button>
-          </mat-card-actions>
-        </mat-card>
-      </form>
-    </div>
-  `
+  templateUrl: './user-detail.component.html',
+  styleUrls: ['./user-detail.component.scss']
 })
 export class UserDetailComponent implements OnInit {
   userForm: FormGroup;

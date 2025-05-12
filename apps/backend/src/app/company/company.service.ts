@@ -1,4 +1,5 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { Company } from './company.entity';
 import { CompanyRepository } from './company.repository';
@@ -7,7 +8,8 @@ import { CompanyRepository } from './company.repository';
 export class CompanyService {
   constructor(
     @InjectRepository(Company)
-    private readonly companyRepository: CompanyRepository
+    private readonly companyRepository: CompanyRepository,
+    private readonly em: EntityManager
   ) {}
 
   async findAll(): Promise<Company[]> {
@@ -20,7 +22,7 @@ export class CompanyService {
 
   async create(companyData: Partial<Company>): Promise<Company> {
     const company = this.companyRepository.create(companyData);
-    await this.companyRepository.persistAndFlush(company);
+    await this.em.persistAndFlush(company);
     return company;
   }
 
@@ -30,8 +32,8 @@ export class CompanyService {
       return null;
     }
 
-    this.companyRepository.assign(company, companyData);
-    await this.companyRepository.flush();
+    this.em.assign(company, companyData);
+    await this.em.flush();
     return company;
   }
 
@@ -41,7 +43,7 @@ export class CompanyService {
       return false;
     }
 
-    await this.companyRepository.removeAndFlush(company);
+    await this.em.removeAndFlush(company);
     return true;
   }
 }

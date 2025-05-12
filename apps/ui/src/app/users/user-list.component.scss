@@ -1,0 +1,21 @@
+.mat-mdc-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+  }
+  
+  // Überschreiben der Material Design Stile
+  :host ::ng-deep {
+    .mat-mdc-table {
+      box-shadow: none;
+      border-collapse: collapse;
+    }
+    
+    .mat-mdc-header-cell {
+      font-weight: 600;
+      color: #4b5563;
+    }
+    
+    .mat-mdc-cell {
+      border-bottom: 1px solid #e5e7eb;
+    }
+  }

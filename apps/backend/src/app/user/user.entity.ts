@@ -1,3 +1,4 @@
+// apps/backend/src/app/user/user.entity.ts
 import { BaseEntity, Collection, Entity, ManyToMany, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { v4 } from 'uuid';
 import { UserRepository } from './user.repository';
@@ -23,6 +24,6 @@ export class User extends BaseEntity {
   @ManyToOne(() => Company, { nullable: true })
   company?: Company;
 
-  @ManyToMany(() => User, 'relatedCoworkers', { owner: true })
+  @ManyToMany(() => User)
   relatedCoworkers = new Collection<User>(this);
 }

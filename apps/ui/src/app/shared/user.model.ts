@@ -1,43 +1,16 @@
-import { LoadStrategy, PopulateHint } from '@mikro-orm/core';
-import { defineConfig, PostgreSqlDriver } from '@mikro-orm/postgresql';
-import { PostgreSqlOptions } from '@mikro-orm/postgresql/PostgreSqlMikroORM';
-import { User } from '../user/user.entity';
-import { Company } from '../company/company.entity';
-import { Audit } from '../audit/audit.entity';
+// apps/ui/src/app/shared/user.model.ts
+export interface Company {
+  id: string;
+  name: string;
+  industry: string | null;
+  address: string | null;
+}
 
-const user = 'postgres';
-const port = 5432;
-const password = 'postgres';
-const dbName = 'acmedb';
-const host = '127.0.0.1';
-
-const ormConfig: PostgreSqlOptions = {
-  driver: PostgreSqlDriver,
-  user,
-  password,
-  host,
-  dbName,
-  port,
-  schema: 'public',
-  debug: true,
-  entities: [
-    User,
-    Company,
-    Audit
-  ],
-  subscribers: [],
-  multipleStatements: true,
-  discovery: {
-    disableDynamicFileAccess: true,
-  },
-  loadStrategy: LoadStrategy.JOINED,
-  populateWhere: PopulateHint.INFER,
-  preferTs: true,
-  migrations: {
-    snapshot: false,
-  },
-  autoJoinRefsForFilters: false,
-  allowGlobalContext: true,
-};
-
-export default defineConfig(ormConfig);
+export interface User {
+  id: string;
+  name: string;
+  position: string | null;
+  email: string | null;
+  address: string | null;
+  company?: Company;
+}

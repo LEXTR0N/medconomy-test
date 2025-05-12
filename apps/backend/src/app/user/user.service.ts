@@ -1,4 +1,5 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
@@ -11,7 +12,8 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: UserRepository,
     private readonly companyService: CompanyService,
-    private readonly auditService: AuditService
+    private readonly auditService: AuditService,
+    private readonly em: EntityManager
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -34,7 +36,7 @@ export class UserService {
       }
     }
     
-    await this.userRepository.persistAndFlush(user);
+    await this.em.persistAndFlush(user); // Geändert: userRepository -> em
     await this.auditService.logActivity('User', user.id, 'CREATE', {});
     
     return user;
@@ -49,7 +51,7 @@ export class UserService {
     const { companyId, ...userDataWithoutCompany } = userData;
     const oldData = { ...user };
     
-    this.userRepository.assign(user, userDataWithoutCompany);
+    this.em.assign(user, userDataWithoutCompany); // Geändert: userRepository -> em
     
     if (companyId) {
       const company = await this.companyService.findOne(companyId);
@@ -58,7 +60,7 @@ export class UserService {
       }
     }
     
-    await this.userRepository.flush();
+    await this.em.flush(); // Geändert: userRepository -> em
     await this.auditService.logActivity('User', user.id, 'UPDATE', oldData);
     
     return user;
@@ -71,7 +73,7 @@ export class UserService {
     }
 
     const oldData = { ...user };
-    await this.userRepository.removeAndFlush(user);
+    await this.em.removeAndFlush(user); // Geändert: userRepository -> em
     await this.auditService.logActivity('User', id, 'DELETE', oldData);
     
     return true;
@@ -86,7 +88,7 @@ export class UserService {
     }
     
     user.relatedCoworkers.add(coworker);
-    await this.userRepository.flush();
+    await this.em.flush();
     
     return user;
   }
@@ -102,7 +104,7 @@ export class UserService {
     
     if (coworker) {
       user.relatedCoworkers.remove(coworker);
-      await this.userRepository.flush();
+      await this.em.flush();
     }
     
     return user;

@@ -1,0 +1,29 @@
+:host ::ng-deep {
+    // Stelle sicher, dass die Label immer angezeigt werden und genug Platz haben
+    .mat-mdc-form-field-infix {
+      width: auto;
+      min-width: 200px;
+    }
+    
+    // Stellt sicher, dass die Labels immer sichtbar sind
+    .mat-mdc-form-field-label {
+      display: block !important;
+      position: relative;
+      margin-bottom: 4px;
+    }
+    
+    // Stellt sicher, dass die Text-Inputs genügend Innenabstand haben
+    .mat-mdc-form-field-wrapper {
+      padding-bottom: 1.25em;
+    }
+    
+    // Verbessert die vertikale Ausrichtung der Formularfelder
+    .mat-mdc-form-field {
+      display: block;
+    }
+  }
+  
+  // Verbessert die vertikale Ausrichtung des "+ Buttons" mit dem Company-Feld
+  .flex.items-center {
+    align-items: flex-start;
+  }

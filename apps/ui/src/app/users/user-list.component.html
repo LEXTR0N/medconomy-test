@@ -1,0 +1,108 @@
+<div class="page-container">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="page-title">Users</h1>
+      <button 
+        mat-raised-button 
+        color="primary"
+        class="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow transition-colors"
+        (click)="createUser()"
+      >
+        <mat-icon>add</mat-icon>
+        <span>New User</span>
+      </button>
+    </div>
+  
+    <div class="card">
+      <div class="table-container">
+        <table mat-table [dataSource]="users" class="w-full">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef class="bg-gray-100 text-gray-700 font-medium px-4 py-3">Name</th>
+            <td mat-cell *matCellDef="let user" class="px-4 py-3 border-t border-gray-200">{{ user.name }}</td>
+          </ng-container>
+  
+          <!-- Position Column -->
+          <ng-container matColumnDef="position">
+            <th mat-header-cell *matHeaderCellDef class="bg-gray-100 text-gray-700 font-medium px-4 py-3">Position</th>
+            <td mat-cell *matCellDef="let user" class="px-4 py-3 border-t border-gray-200">
+              <span *ngIf="user.position">{{ user.position }}</span>
+              <span *ngIf="!user.position" class="text-gray-400 italic">Not specified</span>
+            </td>
+          </ng-container>
+  
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef class="bg-gray-100 text-gray-700 font-medium px-4 py-3">Email</th>
+            <td mat-cell *matCellDef="let user" class="px-4 py-3 border-t border-gray-200">
+              <span *ngIf="user.email">{{ user.email }}</span>
+              <span *ngIf="!user.email" class="text-gray-400 italic">Not specified</span>
+            </td>
+          </ng-container>
+  
+          <!-- Company Column -->
+          <ng-container matColumnDef="company">
+            <th mat-header-cell *matHeaderCellDef class="bg-gray-100 text-gray-700 font-medium px-4 py-3">Company</th>
+            <td mat-cell *matCellDef="let user" class="px-4 py-3 border-t border-gray-200">
+              <span *ngIf="user.company?.name" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{ user.company?.name }}
+              </span>
+              <span *ngIf="!user.company?.name" class="text-gray-400 italic">Not assigned</span>
+            </td>
+          </ng-container>
+  
+          <!-- Action Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="bg-gray-100 text-gray-700 font-medium px-4 py-3">Actions</th>
+            <td mat-cell *matCellDef="let user" class="px-4 py-3 border-t border-gray-200">
+              <div class="flex space-x-2">
+                <button 
+                  mat-icon-button 
+                  class="text-blue-600 hover:text-blue-800 transition-colors p-1 rounded-full hover:bg-blue-50"
+                  (click)="viewUser(user.id)" 
+                  matTooltip="View Details"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  class="text-amber-600 hover:text-amber-800 transition-colors p-1 rounded-full hover:bg-amber-50"
+                  (click)="editUser(user.id)" 
+                  matTooltip="Edit User"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  class="text-red-600 hover:text-red-800 transition-colors p-1 rounded-full hover:bg-red-50"
+                  (click)="deleteUser(user.id)" 
+                  matTooltip="Delete User"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+  
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr 
+            mat-row 
+            *matRowDef="let row; columns: displayedColumns" 
+            class="hover:bg-gray-50 transition-colors duration-150"
+          ></tr>
+        </table>
+      </div>
+      
+      <div *ngIf="users.length === 0" class="p-8 text-center text-gray-500">
+        <mat-icon class="text-gray-300 text-6xl mx-auto mb-4">people_outline</mat-icon>
+        <p class="text-lg">No users found.</p>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+          (click)="createUser()"
+        >
+          Create User
+        </button>
+      </div>
+    </div>
+  </div>

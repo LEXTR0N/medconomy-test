@@ -1,3 +1,4 @@
+// apps/backend/src/main.ts
 /**
  * This is not a production server yet!
  * This is only a minimal backend to get started.
@@ -11,10 +12,18 @@ import ormConfig from './app/config/orm.config';
 
 async function bootstrap() {
   
-  await OrmMetadata.init(ormConfig)
-  await OrmMetadata.synchronizeDbSchema()
+  await OrmMetadata.init(ormConfig);
+  await OrmMetadata.synchronizeDbSchema();
   
   const app = await NestFactory.create(AppModule);
+  
+  // Enable CORS für Frontend
+  app.enableCors({
+    origin: 'http://localhost:4200',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+  
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   const port = process.env.PORT || 3000;

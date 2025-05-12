@@ -1,4 +1,5 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { Audit, OperationType } from './audit.entity';
 import { AuditRepository } from './audit.repository';
@@ -7,7 +8,8 @@ import { AuditRepository } from './audit.repository';
 export class AuditService {
   constructor(
     @InjectRepository(Audit)
-    private readonly auditRepository: AuditRepository
+    private readonly auditRepository: AuditRepository,
+    private readonly em: EntityManager
   ) {}
 
   async logActivity(
@@ -25,7 +27,7 @@ export class AuditService {
       userId: userId || null,
     });
 
-    await this.auditRepository.persistAndFlush(audit);
+    await this.em.persistAndFlush(audit);
     return audit;
   }
 
