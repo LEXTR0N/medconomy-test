@@ -7,6 +7,7 @@ import { UserService } from '../shared/user.service';
 import { CompanyService } from '../shared/company.service';
 import { User, Company } from '../shared/user.model';
 import { CompanyDialogComponent } from './company-dialog.component';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-detail',
@@ -24,6 +25,8 @@ export class UserDetailComponent implements OnInit {
   userId: string | null = null;
   isNewUser = true;
   companies: Company[] = [];
+  isSubmitting = false;
+  submitError: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -54,38 +57,78 @@ export class UserDetailComponent implements OnInit {
   }
 
   loadUser(id: string): void {
-    this.userService.getUser(id).subscribe(user => {
-      this.userForm.patchValue({
-        name: user.name,
-        position: user.position,
-        email: user.email,
-        address: user.address,
-        companyId: user.company?.id || null
-      });
+    this.userService.getUser(id).subscribe({
+      next: (user) => {
+        console.log('Loaded user:', user);
+        this.userForm.patchValue({
+          name: user.name,
+          position: user.position,
+          email: user.email,
+          address: user.address,
+          companyId: user.company?.id || null
+        });
+      },
+      error: (err) => {
+        console.error('Error loading user:', err);
+        alert('Error loading user. Please try again.');
+      }
     });
   }
 
   loadCompanies(): void {
-    this.companyService.getCompanies().subscribe(companies => {
-      this.companies = companies;
+    this.companyService.getCompanies().subscribe({
+      next: (companies) => {
+        console.log('Loaded companies:', companies);
+        this.companies = companies;
+      },
+      error: (err) => {
+        console.error('Error loading companies:', err);
+      }
     });
   }
 
   onSubmit(): void {
     if (this.userForm.invalid) {
+      // Mark all fields as touched to trigger validation errors
+      Object.keys(this.userForm.controls).forEach(key => {
+        const control = this.userForm.get(key);
+        control?.markAsTouched();
+      });
       return;
     }
+
+    console.log('Form submitted with values:', this.userForm.value);
+    this.isSubmitting = true;
+    this.submitError = null;
 
     const userData = this.userForm.value;
 
     if (this.isNewUser) {
-      this.userService.createUser(userData).subscribe(() => {
-        this.router.navigate(['/users']);
-      });
+      this.userService.createUser(userData)
+        .pipe(finalize(() => this.isSubmitting = false))
+        .subscribe({
+          next: (createdUser) => {
+            console.log('User created successfully:', createdUser);
+            this.router.navigate(['/users']);
+          },
+          error: (err) => {
+            console.error('Error creating user:', err);
+            this.submitError = 'Failed to create user. Please try again.';
+          }
+        });
     } else if (this.userId) {
-      this.userService.updateUser(this.userId, userData).subscribe(() => {
-        this.router.navigate(['/users']);
-      });
+      this.userService.updateUser(this.userId, userData)
+        .pipe(finalize(() => this.isSubmitting = false))
+        .subscribe({
+          next: (updatedUser) => {
+            console.log('User updated successfully:', updatedUser);
+            this.router.navigate(['/users']);
+          },
+          error: (err) => {
+            console.error('Error updating user:', err);
+            this.submitError = 'Failed to update user. Please try again.';
+          }
+        });
     }
   }
 
@@ -96,9 +139,16 @@ export class UserDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.companyService.createCompany(result).subscribe(newCompany => {
-          this.companies = [...this.companies, newCompany];
-          this.userForm.patchValue({ companyId: newCompany.id });
+        this.companyService.createCompany(result).subscribe({
+          next: (newCompany) => {
+            console.log('Company created successfully:', newCompany);
+            this.companies = [...this.companies, newCompany];
+            this.userForm.patchValue({ companyId: newCompany.id });
+          },
+          error: (err) => {
+            console.error('Error creating company:', err);
+            alert('Failed to create company. Please try again.');
+          }
         });
       }
     });
