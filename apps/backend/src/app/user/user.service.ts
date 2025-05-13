@@ -25,21 +25,33 @@ export class UserService {
   }
 
   async create(userData: Partial<User> & { companyId?: string }): Promise<User> {
+    console.log('Processing user data in service:', JSON.stringify(userData, null, 2));
+    
     const { companyId, ...userDataWithoutCompany } = userData;
+    console.log('User data without company:', JSON.stringify(userDataWithoutCompany, null, 2));
+    console.log('Company ID:', companyId);
     
     const user = this.userRepository.create(userDataWithoutCompany);
     
     if (companyId) {
+      console.log('Looking up company with ID:', companyId);
       const company = await this.companyService.findOne(companyId);
+      console.log('Found company:', company ? JSON.stringify(company, null, 2) : 'null');
       if (company) {
         user.company = company;
       }
     }
     
-    await this.em.persistAndFlush(user); // Geändert: userRepository -> em
-    await this.auditService.logActivity('User', user.id, 'CREATE', {});
-    
-    return user;
+    try {
+      console.log('Attempting to persist user:', JSON.stringify(user, null, 2));
+      await this.em.persistAndFlush(user);
+      console.log('User successfully persisted with ID:', user.id);
+      await this.auditService.logActivity('User', user.id, 'CREATE', {});
+      return user;
+    } catch (error) {
+      console.error('Error persisting user:', error);
+      throw error;
+    }
   }
 
   async update(id: string, userData: Partial<User> & { companyId?: string }): Promise<User | null> {
@@ -51,7 +63,7 @@ export class UserService {
     const { companyId, ...userDataWithoutCompany } = userData;
     const oldData = { ...user };
     
-    this.em.assign(user, userDataWithoutCompany); // Geändert: userRepository -> em
+    this.em.assign(user, userDataWithoutCompany);
     
     if (companyId) {
       const company = await this.companyService.findOne(companyId);
@@ -60,7 +72,7 @@ export class UserService {
       }
     }
     
-    await this.em.flush(); // Geändert: userRepository -> em
+    await this.em.flush();
     await this.auditService.logActivity('User', user.id, 'UPDATE', oldData);
     
     return user;
@@ -73,7 +85,7 @@ export class UserService {
     }
 
     const oldData = { ...user };
-    await this.em.removeAndFlush(user); // Geändert: userRepository -> em
+    await this.em.removeAndFlush(user);
     await this.auditService.logActivity('User', id, 'DELETE', oldData);
     
     return true;

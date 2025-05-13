@@ -7,7 +7,8 @@ import { UserService } from '../shared/user.service';
 import { CompanyService } from '../shared/company.service';
 import { User, Company } from '../shared/user.model';
 import { CompanyDialogComponent } from './company-dialog.component';
-import { finalize } from 'rxjs/operators';
+import { finalize, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-user-detail',
@@ -49,7 +50,7 @@ export class UserDetailComponent implements OnInit {
     this.loadCompanies();
     
     this.userId = this.route.snapshot.paramMap.get('id');
-    this.isNewUser = this.userId === 'new';
+    this.isNewUser = !this.userId || this.userId === 'new';
 
     if (!this.isNewUser && this.userId) {
       this.loadUser(this.userId);
@@ -102,31 +103,44 @@ export class UserDetailComponent implements OnInit {
     this.submitError = null;
 
     const userData = this.userForm.value;
+    console.log('Sending data to service:', userData);
 
     if (this.isNewUser) {
+      // Debugging: Log request before sending
+      console.log('About to call createUser with data:', userData);
+      
       this.userService.createUser(userData)
-        .pipe(finalize(() => this.isSubmitting = false))
-        .subscribe({
-          next: (createdUser) => {
-            console.log('User created successfully:', createdUser);
+        .pipe(
+          catchError(err => {
+            console.error('Error caught in component:', err);
+            this.submitError = `Failed to create user: ${err.status} ${err.statusText || err.message}`;
+            return of(null);
+          }),
+          finalize(() => {
+            console.log('Request completed (success or error)');
+            this.isSubmitting = false;
+          })
+        )
+        .subscribe(response => {
+          if (response) {
+            console.log('User created successfully:', response);
             this.router.navigate(['/users']);
-          },
-          error: (err) => {
-            console.error('Error creating user:', err);
-            this.submitError = 'Failed to create user. Please try again.';
           }
         });
     } else if (this.userId) {
       this.userService.updateUser(this.userId, userData)
-        .pipe(finalize(() => this.isSubmitting = false))
-        .subscribe({
-          next: (updatedUser) => {
-            console.log('User updated successfully:', updatedUser);
-            this.router.navigate(['/users']);
-          },
-          error: (err) => {
+        .pipe(
+          catchError(err => {
             console.error('Error updating user:', err);
             this.submitError = 'Failed to update user. Please try again.';
+            return of(null);
+          }),
+          finalize(() => this.isSubmitting = false)
+        )
+        .subscribe(response => {
+          if (response) {
+            console.log('User updated successfully:', response);
+            this.router.navigate(['/users']);
           }
         });
     }

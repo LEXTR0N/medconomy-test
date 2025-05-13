@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -21,7 +22,12 @@ export class UserController {
   }
 
   @Post()
-  async create(@Body() userData: Partial<User> & { companyId?: string }): Promise<User> {
+  async create(@Body() userData: Partial<User> & { companyId?: string }, @Req() request: Request): Promise<User> {
+    console.log('---------------------------------------------');
+    console.log('POST /users - Received request:');
+    console.log('Headers:', JSON.stringify(request.headers, null, 2));
+    console.log('Body data:', JSON.stringify(userData, null, 2));
+    console.log('---------------------------------------------');
     return this.userService.create(userData);
   }
 

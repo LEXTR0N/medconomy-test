@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from './user.model';
 
@@ -20,11 +20,20 @@ export class UserService {
   }
 
   createUser(user: Partial<User> & { companyId?: string }): Observable<User> {
-    return this.http.post<User>(this.apiUrl, user);
+    console.log('UserService - sending data to backend:', user);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    
+    return this.http.post<User>(this.apiUrl, user, { headers });
   }
 
   updateUser(id: string, user: Partial<User> & { companyId?: string }): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, user);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    
+    return this.http.put<User>(`${this.apiUrl}/${id}`, user, { headers });
   }
 
   deleteUser(id: string): Observable<void> {
